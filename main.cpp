@@ -7,6 +7,14 @@
 #include "kernel_sse4.h"
 #include "ubench.h"
 
+namespace ispc {
+extern "C" {
+extern void write_indexbuffer_ispc_sse2(uint16_t* output, uint16_t start_id, int count);
+extern void write_indexbuffer_ispc_sse4(uint16_t* output, uint16_t start_id, int count);
+extern void write_indexbuffer_ispc_avx2(uint16_t* output, uint16_t start_id, int count);
+}
+}  // namespace ispc
+
 const int iteration_count = 10000;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
