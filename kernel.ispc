@@ -81,10 +81,10 @@ export void write_vertexdata_ispc(uniform int32 output[], uniform int32 input[],
         float rx = xoff + pos.x + x_pos;
         float ry = yoff + pos.y;
 
-        float nx0 = rx;
-        float ny0 = ry;
-        float nx1 = rx + (x1 - x0);
-        float ny1 = ry + (y1 - y0);
+        int32 nx0 = intbits(rx);
+        int32 ny0 = intbits(ry);
+        int32 nx1 = intbits(rx + (x1 - x0));
+        int32 ny1 = intbits(ry + (y1 - y0));
 
         int32 x1y0 = ((x1y1 & 0xffff0000) | (x0y0 & 0x00000ffff));
         int32 x0y1 = ((x0y0 & 0xffff0000) | (x1y1 & 0x00000ffff));
