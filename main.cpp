@@ -15,7 +15,24 @@ extern void write_indexbuffer_ispc_avx2(uint16_t* output, uint16_t start_id, int
 }
 }  // namespace ispc
 
-const int iteration_count = 10000;
+const int iteration_count = 100000;
+
+/*
+uint16_t* t = output_data;
+
+for (int i = 0; i < 14; ++i) {
+    for (int i = 0; i < 3; ++i) {
+        printf("%d ", *t++);
+    }
+    printf(" - ");
+
+    for (int i = 0; i < 3; ++i) {
+        printf("%d ", *t++);
+    }
+
+    printf("\n");
+}
+*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -49,7 +66,10 @@ UBENCH_EX(write_vertices, manual_sse2) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 UBENCH_EX(write_vertices, ispc_sse2) {
-    uint16_t* output_data = new uint16_t[(iteration_count * 6) + 128];
+    int size = (iteration_count * 6) + 128;
+    uint16_t* output_data = new uint16_t[size];
+
+    memset(output_data, 0, sizeof(uint16_t) * size);
 
     UBENCH_DO_BENCHMARK() {
         ispc::write_indexbuffer_ispc_sse2(output_data, 0, iteration_count);
@@ -73,7 +93,8 @@ UBENCH_EX(write_vertices, ispc_sse4) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 UBENCH_EX(write_vertices, ispc_avx2) {
-    uint16_t* output_data = new uint16_t[(iteration_count * 6) + 128];
+    uint16_t* output_data = new uint16_t[(iteration_count * 12) + 128];
+    memset(output_data, 0, 1024);
 
     UBENCH_DO_BENCHMARK() {
         ispc::write_indexbuffer_ispc_avx2(output_data, 0, iteration_count);

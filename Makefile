@@ -1,7 +1,7 @@
 CXX ?= clang++
 ISPC ?= ispc
 CXXFLAGS ?= -O3
-ISPC_FLAGS ?= --target=sse2,sse4,avx2
+ISPC_FLAGS ?= -O1 --target=sse2,sse4-i16x8,avx2
 
 ISPC_OBJS = kernel.o kernel_sse2.o kernel_sse4.o kernel_avx2.o 
 CPP_OBJS = main.o
