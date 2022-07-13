@@ -89,10 +89,10 @@ export void write_vertexdata_ispc(uniform int32 output[], uniform int32 input[],
         int32 x1y0 = ((x1y1 & 0xffff0000) | (x0y0 & 0x00000ffff));
         int32 x0y1 = ((x0y0 & 0xffff0000) | (x1y1 & 0x00000ffff));
 
-        soa_to_aos4(nx0, ny0, x0y0, color, &output[(i * programCount) + 0]);
-        soa_to_aos4(nx1, ny0, x1y0, color, &output[(i * programCount) + 4]);
-        soa_to_aos4(nx1, ny1, x1y1, color, &output[(i * programCount) + 8]);
-        soa_to_aos4(nx0, ny1, x0y1, color, &output[(i * programCount) + 12]);
+        soa_to_aos4(nx0, ny0, x0y0, color, &output[(i * programCount) + programCount * 0]);
+        soa_to_aos4(nx1, ny0, x1y0, color, &output[(i * programCount) + programCount * 1]);
+        soa_to_aos4(nx1, ny1, x1y1, color, &output[(i * programCount) + programCount * 2]);
+        soa_to_aos4(nx0, ny1, x0y1, color, &output[(i * programCount) + programCount * 3]);
 
         x_pos += x_adv; 
     }

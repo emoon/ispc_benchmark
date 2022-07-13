@@ -1,3 +1,7 @@
+#if defined(__ARM_ARCH)
+#include "kernel_arm.h"
+#include "sse2neon.h"
+#else
 #include <emmintrin.h>  // __m128i
 #include <smmintrin.h>
 #include <stdint.h>
@@ -5,6 +9,8 @@
 #include "kernel_avx2.h"
 #include "kernel_sse2.h"
 #include "kernel_sse4.h"
+#endif
+
 #include "ubench.h"
 
 struct Vec2 {
@@ -29,34 +35,22 @@ struct VertPosUvColor {
 
 namespace ispc {
 extern "C" {
+#if !defined(__ARM_ARCH)
 extern void write_indexbuffer_ispc_sse2(uint16_t* output, uint16_t start_id, int count);
 extern void write_indexbuffer_ispc_sse4(uint16_t* output, uint16_t start_id, int count);
 extern void write_indexbuffer_ispc_avx2(uint16_t* output, uint16_t start_id, int count);
 extern void write_vertexdata_ispc_sse2(int32_t* output, int32_t* input, struct Vec2& pos, uint64_t count);
 extern void write_vertexdata_ispc_sse4(int32_t* output, int32_t* input, struct Vec2& pos, uint64_t count);
 extern void write_vertexdata_ispc_avx2(int32_t* output, int32_t* input, struct Vec2& pos, uint64_t count);
+#else
+extern void write_indexbuffer_ispc(uint16_t* output, uint16_t start_id, int count);
+extern void write_vertexdata_ispc(int32_t* output, int32_t* input, struct Vec2& pos, uint64_t count);
+#endif
 }
 }  // namespace ispc
 
 const int iteration_count = 100000;
 const int vert_iteration_count = 10000;
-
-/*
-uint16_t* t = output_data;
-
-for (int i = 0; i < 14; ++i) {
-    for (int i = 0; i < 3; ++i) {
-        printf("%d ", *t++);
-    }
-    printf(" - ");
-
-    for (int i = 0; i < 3; ++i) {
-        printf("%d ", *t++);
-    }
-
-    printf("\n");
-}
-*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -111,7 +105,11 @@ UBENCH_EX(write_indexbuffer, c_ref) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#if defined(__ARM_ARCH)
+UBENCH_EX(write_indexbuffer, sse2neon) {
+#else
 UBENCH_EX(write_indexbuffer, sse2) {
+#endif
     uint16_t* output_data = new uint16_t[(iteration_count * 6) + 8];
 
     UBENCH_DO_BENCHMARK() {
@@ -120,6 +118,8 @@ UBENCH_EX(write_indexbuffer, sse2) {
 
     delete[] output_data;
 }
+
+#if !defined(__ARM_ARCH)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -163,6 +163,25 @@ UBENCH_EX(write_indexbuffer, ispc_avx2) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#else
+
+UBENCH_EX(write_indexbuffer, ispc_neon) {
+    int size = (iteration_count * 6) + 128;
+    uint16_t* output_data = new uint16_t[size];
+
+    memset(output_data, 0, sizeof(uint16_t) * size);
+
+    UBENCH_DO_BENCHMARK() {
+        ispc::write_indexbuffer_ispc(output_data, 0, iteration_count);
+    }
+
+    delete[] output_data;
+}
+
+#endif
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 UBENCH_EX(write_vertexdata, c_ref) {
     TempVertexData data = create_vert_temp();
 
@@ -172,6 +191,8 @@ UBENCH_EX(write_vertexdata, c_ref) {
 
     destroy_vert_temp(data);
 }
+
+#if !defined(__ARM_ARCH)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -211,6 +232,23 @@ UBENCH_EX(write_vertexdata, iscp_avx2) {
 
     destroy_vert_temp(data);
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#else
+
+UBENCH_EX(write_vertexdata, iscp_neon) {
+    TempVertexData data = create_vert_temp();
+
+    UBENCH_DO_BENCHMARK() {
+        ispc::Vec2 pos = {0, 0};
+        ispc::write_vertexdata_ispc((int32_t*)data.output, (int32_t*)data.glyphs, pos, vert_iteration_count);
+    }
+
+    destroy_vert_temp(data);
+}
+
+#endif
 
 UBENCH_MAIN();
 

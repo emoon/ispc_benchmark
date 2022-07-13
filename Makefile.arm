@@ -1,0 +1,26 @@
+CXX = /usr/bin/arm-linux-gnueabihf-g++
+ISPC ?= ispc
+CXXFLAGS ?= -O3 -mfpu=neon
+ISPC_FLAGS ?= -O1 --target=neon --target-os=linux --arch=arm --addressing=32
+
+ISPC_OBJS = kernel_arm.o
+CPP_OBJS = main.o
+OBJS = $(ISPC_OBJS) $(CPP_OBJS) 
+ISPC_HEADERS = kernel_asm.h
+PROG = ispc_bench_arm
+
+all: $(PROG) 
+
+# Simple "generate .o from .cpp using c++ compiler"
+$(CPP_OBJS) : main.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Generate .o and .h +variants using ispc
+$(ISPC_OBJS) $(ISPC_HEADERS) : kernel.ispc
+	$(ISPC) $(ISPC_FLAGS) -o $@ -h kernel_arm.h $<
+
+clean:
+	rm -f $(OBJS) $(ISPC_HEADERS) $(PROG)
+
+$(PROG): $(OBJS)
+	$(CXX) -o $@ $^
