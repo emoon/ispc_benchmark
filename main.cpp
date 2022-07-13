@@ -196,7 +196,7 @@ UBENCH_EX(write_vertexdata, c_ref) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-UBENCH_EX(write_vertexdata, iscp_sse2) {
+UBENCH_EX(write_vertexdata, ispc_sse2) {
     TempVertexData data = create_vert_temp();
 
     UBENCH_DO_BENCHMARK() {
@@ -209,7 +209,7 @@ UBENCH_EX(write_vertexdata, iscp_sse2) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-UBENCH_EX(write_vertexdata, iscp_sse4) {
+UBENCH_EX(write_vertexdata, ispc_sse4) {
     TempVertexData data = create_vert_temp();
 
     UBENCH_DO_BENCHMARK() {
@@ -222,7 +222,7 @@ UBENCH_EX(write_vertexdata, iscp_sse4) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-UBENCH_EX(write_vertexdata, iscp_avx2) {
+UBENCH_EX(write_vertexdata, ispc_avx2) {
     TempVertexData data = create_vert_temp();
 
     UBENCH_DO_BENCHMARK() {
@@ -237,7 +237,7 @@ UBENCH_EX(write_vertexdata, iscp_avx2) {
 
 #else
 
-UBENCH_EX(write_vertexdata, iscp_neon) {
+UBENCH_EX(write_vertexdata, ispc_neon) {
     TempVertexData data = create_vert_temp();
 
     UBENCH_DO_BENCHMARK() {
